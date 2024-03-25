@@ -1,2 +1,7 @@
 env/
 Satellite Datasets/
+.ipynb_checkpoints/
+output-dmog-search.txt/
+dmog_search.py/
+dmog_search_1.py/
+.DS_Store/
