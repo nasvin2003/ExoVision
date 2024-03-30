@@ -2,8 +2,9 @@ env/
 Satellite Datasets/
 .ipynb_checkpoints/
 output-dmog-search.txt/
-dmog_search.py/
-dmog_search_1.py/
+dmog_search.py
+dmog_search_1.py
 .DS_Store/
-acc_graph.png/
-loss_graph.png/
+acc_graph.png
+loss_graph.png
+.gitignore
