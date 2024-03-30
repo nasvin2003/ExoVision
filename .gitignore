@@ -13,3 +13,24 @@ Exoplanet_Model_Testing_v2.ipynb
 Exoplanet_Model_Testing_Weird.ipynb
 Exoplanet_Dataset_Preperation.ipynb
 Datasets/
+
+User_Interface/exovision-ui/node_modules
+ser_Interface/exovision-ui/.pnp
+ser_Interface/exovision-ui/.pnp.js
+
+# testing
+ser_Interface/exovision-ui/coverage
+
+# production
+ser_Interface/exovision-ui/build
+
+# misc
+ser_Interface/exovision-ui/.DS_Store
+ser_Interface/exovision-ui/.env.local
+ser_Interface/exovision-ui/.env.development.local
+ser_Interface/exovision-ui/.env.test.local
+ser_Interface/exovision-ui/.env.production.local
+
+ser_Interface/exovision-ui/npm-debug.log*
+ser_Interface/exovision-ui/yarn-debug.log*
+ser_Interface/exovision-ui/yarn-error.log*
