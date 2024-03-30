@@ -1,10 +1,10 @@
 env/
 Satellite Datasets/
-.ipynb_checkpoints/
+.ipynb_checkpoints
 output-dmog-search.txt/
 dmog_search.py
 dmog_search_1.py
-.DS_Store/
+.DS_Store
 acc_graph.png
 loss_graph.png
 Exoplanet_Dataset_Preprocessing.ipynb
