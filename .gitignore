@@ -26,7 +26,7 @@ react_server/exovision-ui/coverage
 
 # production
 react_server/exovision-ui/build/
-react_server/exovision-ui/public/bg.mp4
+# react_server/exovision-ui/public/bg.mp4
 
 # misc
 react_server/exovision-ui/.DS_Store
