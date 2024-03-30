@@ -7,3 +7,8 @@ dmog_search_1.py
 .DS_Store/
 acc_graph.png
 loss_graph.png
+Exoplanet_Dataset_Preprocessing.ipynb
+Exoplanet_Model_Testing_v1.ipynb
+Exoplanet_Model_Testing_v2.ipynb
+Exoplanet_Model_Testing_Weird.ipynb
+Datasets/
