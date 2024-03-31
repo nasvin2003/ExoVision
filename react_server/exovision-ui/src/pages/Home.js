@@ -7,11 +7,11 @@ const Home = () => {
     const videoRef = useRef(null);
 
     useEffect(() => {
-        // Check if videoRef.current is not null before trying to access playbackRate
         if (videoRef.current) {
-            videoRef.current.playbackRate = 3; // Slow down the video to half its original speed
+            videoRef.current.playbackRate = 3; 
         }
-    }, []); // The empty array ensures this effect runs only once when the component mounts
+    }, []);
+     
     return (
         <div className="home__page__screen">
             <div
@@ -30,46 +30,13 @@ const Home = () => {
 
             <div style={{ position: "fixed", marginTop: "-65vh", marginLeft: "60vw", zIndex: 2, textAlign: "right" }}>
                 <div>
-                    <span
-                        style={{
-                            color: "white",
-                            fontSize: "100px",
-                            fontFamily: "Montserrat",
-                            fontWeight: 650,
-                            fontStyle: "italic",
-                            textShadow: "10px 10px 10px #000000",
-                        }}
-                    >
-                        DISCOVER
-                    </span>
+                    <span className="jap">DISCOVER</span>
                 </div>
                 <div>
-                    <span
-                        style={{
-                            color: "white",
-                            fontSize: "100px",
-                            fontFamily: "Montserrat",
-                            fontWeight: 650,
-                            fontStyle: "italic",
-                            textShadow: "10px 10px 10px #000000",
-                        }}
-                    >
-                        BEYOND
-                    </span>
+                    <span className="jap">BEYOND</span>
                 </div>
                 <div>
-                    <span
-                        style={{
-                            color: "white",
-                            fontSize: "100px",
-                            fontFamily: "Montserrat",
-                            fontWeight: 650,
-                            fontStyle: "italic",
-                            textShadow: "10px 10px 10px #000000",
-                        }}
-                    >
-                        HORIZONS
-                    </span>
+                    <span className="jap">HORIZONS</span>
                 </div>
             </div>
 

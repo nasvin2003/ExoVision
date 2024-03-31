@@ -1,3 +1,28 @@
+@import 'normalize.css';
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../components/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Montserrat-Bold';
+    src: url('../components/fonts/Montserrat/static/Montserrat-MediumItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.jap{
+    color: "white";
+    font-size: 100px;
+    font-family: Montserrat-Bold;
+    font-weight: 650;
+    font-style: italic;
+    text-shadow: 10px 10px 10px #000000;
+}
+
 .app-container {
     display: flex;
     flex-direction: column;
@@ -140,7 +165,7 @@
 }
 
 .search-and-filter-bar {
-    position: -webkit-sticky;
+    /* position: -webkit-sticky; */
     position: sticky;
     top: 0;
     z-index: 1000;

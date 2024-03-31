@@ -33,7 +33,6 @@ import tempfile
 
 app = Flask(__name__)
 @app.route('/api/graphs/<identifier>/general', methods=['GET'])
-
 def plot_graphs(identifier):
 
     images_dir = os.path.join(tempfile.gettempdir(), 'plot_images')
@@ -131,7 +130,7 @@ def serve_image(filename):
 
 @app.route('/api/archive')
 def get_archive():
-    archive = pd.read_csv('../../../ExoVision/Satellite Datasets/exoplanet_star_trend_flux.csv')[['tid','confirmed_planet']]
+    archive = pd.read_csv('../../../ExoVision/Datasets/updated_database_exoplanet.csv')[['tid','confirmed_planet']]
     return jsonify(archive.to_dict(orient='records'))
 
 if __name__ == "__main__":

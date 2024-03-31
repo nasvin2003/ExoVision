@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 
 const Analyze = () => {
     const [plotUrls, setPlotUrls] = useState({ generalPlotUrl: "", trendPlotUrl: "" });
+    const [data, setData] = useState([]);
     const { tid } = useParams();
 
     useEffect(() => {
@@ -20,10 +21,66 @@ const Analyze = () => {
         }
     }, []);
 
+    useEffect(() => {
+        fetch("/api/archive")
+            .then((res) => res.json())
+            .then((data) => {
+                setData(data);
+                console.log(data);
+            });
+    });
+
     return (
         <div className="app-container">
             {tid !== "empty" ? (
                 <div>
+                    <div style={{ display: "flex", height: "7vh", marginBottom: "20px", width: "100%" }}>
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                width: "35%",
+                                marginRight: "20px",
+                                backgroundColor: "black",
+                                borderRadius: "15px",
+                                height: "100%",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontFamily: "Montserrat",
+                                    fontSize: "20px",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    paddingLeft: "15px",
+                                }}
+                            >
+                                Planet ID:{" "}
+                            </span>
+                        </div>
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                width: "65%",
+                                backgroundColor: "black",
+                                borderRadius: "15px",
+                                height: "100%",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontFamily: "Montserrat",
+                                    fontSize: "20px",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    paddingLeft: "15px",
+                                }}
+                            >
+                                Exoplanet Status:{" "}
+                            </span>
+                        </div>
+                    </div>
                     <div className="graph-container">
                         <div className="container-text">
                             <h2 className="graph-text">General Flux Visualisation</h2>
