@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 const Analyze = () => {
     const [plotUrls, setPlotUrls] = useState({ generalPlotUrl: "", trendPlotUrl: "" });
-    const [data, setData] = useState([]);
     const { tid } = useParams();
 
     useEffect(() => {
@@ -20,15 +19,6 @@ const Analyze = () => {
                 });
         }
     }, []);
-
-    useEffect(() => {
-        fetch("/api/archive")
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-                console.log(data);
-            });
-    });
 
     return (
         <div className="app-container">
@@ -95,7 +85,38 @@ const Analyze = () => {
                     </div>
                 </div>
             ) : (
-                <p>NO PLANETSSS</p>
+                <div style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center" }}>
+                    <div style={{ height: "60vh", width: "70vw", justifyContent: "center", display: "flex" }}>
+                        <div
+                            style={{
+                                fontSize: "250px",
+                                textAlign: "center",
+                                alignSelf: "center",
+                                justifySelf: "center",
+                                borderWidth: "3px",
+                                borderColor: "#00000",
+                                borderStyle: "solid",
+                                padding: "70px",
+                                borderRadius: "30px",
+                            }}
+                        >
+                            {React.createElement("i", { className: "bx bx-error" })}
+                            <p
+                                style={{
+                                    font: "Montesserat",
+                                    fontSize: "50px",
+                                    fontWeight: "bold",
+                                    marginTop: "-30px",
+                                }}
+                            >
+                                Star ID Unavailable!
+                            </p>
+                            <p style={{ font: "Montesserat", fontSize: "25px", fontWeight: "bold", marginTop: "30px" }}>
+                                Please select a valid star from the Star Archive or by searching it in the Search Page
+                            </p>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
