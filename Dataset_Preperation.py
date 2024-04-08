@@ -10,8 +10,11 @@ import pandas as pd
 import lightkurve as lk
 import requests
 from astroquery.mast import Catalogs
+from tslearn.preprocessing import TimeSeriesResampler
+from sklearn.preprocessing import MinMaxScaler
 
 value_df = 10000
+num_planets = 0
 
 def install_datasets():
     datasets = [
@@ -35,7 +38,7 @@ def get_planet_ids():
     stars = pd.concat([stars1,stars2,stars3,stars4])
     stars = stars.drop_duplicates('target_name')
     stars['target_name'] = stars['target_name'].apply(lambda x: 'TIC ' + str(x))
-    confirmed_stars = pd.read_csv('confirmed_stars.csv')
+    confirmed_stars = pd.read_csv('./Datasets/confirmed_stars.csv')
     confirmed_stars['tid'] = confirmed_stars['tid'].apply(lambda x: 'TIC ' + str(x))
     stars['confirmed_planet'] = stars['target_name'].isin(confirmed_stars['tid']).astype(int)
     stars = stars.reset_index()
@@ -44,12 +47,12 @@ def get_planet_ids():
     return stars, confirmed_index, unconfirmed_index
 
 def init_new_dataset():
-    with open('./Datasets/exoplanet_star_updated_flux.csv', 'w', newline="", encoding="utf-8") as file:
+    with open('./Datasets/exoplanet_star_updated_flux_1.csv', 'w', newline="", encoding="utf-8") as file:
         csvwriter = csv.writer(file)
         csvwriter.writerow(np.concatenate([['tid', 'confirmed_planet'], np.arange(1, value_df+1)]))
 
 def populate_dataset(stars, confirmed_index, unconfirmed_index):
-    for planet_index in range(0,7000):
+    for planet_index in range(0,10000):
         for conf_index in ['confirmed','nonconfirmed']:
             idno = ""
             planet = ""
@@ -79,19 +82,19 @@ def populate_dataset(stars, confirmed_index, unconfirmed_index):
                 light = pd.DataFrame({'Time':folded_light_curve.time.value,'Flux':flatten_lc}).dropna()
                 flux_series = pd.Series([i[0] for i in light[['Flux']].to_numpy()], index=[i[0] for i in light[['Time']].to_numpy()])
                 decompose_result_mult = seasonal_decompose(flux_series, model="additive", period=int(planet_period.value))
-                trend = decompose_result_mult.trend
-                if trend.shape[0] < 10000:
-                    arr_val = np.full(value_df, pd.DataFrame(trend).mean()[0])
-                    arr_val[5000-(trend.shape[0]//2):5000+(trend.shape[0]//2)] = trend.to_numpy()[:2*(trend.shape[0]//2)]
-                else:
-                    arr_val = trend.to_numpy()[(trend.shape[0]//2-5000):(trend.shape[0]//2+5000)]
-                with open('./Datasets/exoplanet_star_updated_flux.csv', 'a', newline="", encoding="utf-8") as file:
+                trend = TimeSeriesResampler(sz=value_df).fit_transform(decompose_result_mult.trend)[0]
+                scaler = MinMaxScaler()
+                print(trend)
+                new_ts = np.array(trend[0])
+                new_new_ts = scaler.fit_transform(new_ts)
+                with open('./Datasets/exoplanet_star_updated_flux_1.csv', 'a', newline="", encoding="utf-8") as file:
                     csvwriter = csv.writer(file)
-                    st = np.concatenate([[idno,planet],arr_val])
-                    csvwriter.writerow(st)
+                    csvwriter.writerow([i[0] for i in new_new_ts])
+                num_planets += 1
+                print(num_planets)
         
 def get_star_metadata():
-    star = pd.read_csv('./Datasets/exoplanet_star_updated_flux.csv')
+    star = pd.read_csv('./Datasets/exoplanet_star_updated_flux_1.csv')
     star_list = [int(i[0][4:]) for i in star[['tid']].to_numpy()]
     catalog_data = Catalogs.query_criteria(catalog="Tic", ID=star_list)
     catalog_data = catalog_data[['ID','Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']]
@@ -111,18 +114,6 @@ def __main__():
     init_new_dataset()
     populate_dataset(stars, confirmed_index, unconfirmed_index)
     star_dataset = get_star_metadata()
-    star_dataset.to_csv('./Datasets/updated_database_exoplanet.csv')
+    star_dataset.to_csv('./Datasets/updated_database_exoplanet_1.csv')
     
 __main__()
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
