@@ -16,7 +16,6 @@ react_server/exovision-ui/node_modules/
 react_server/exovision-ui/.pnp
 react_server/exovision-ui/.pnp.js
 react_server/exovision-ui/coverage
-react_server/exovision-ui/build/
 react_server/exovision-ui/.DS_Store
 react_server/exovision-ui/.env.local
 react_server/exovision-ui/.env.development.local
