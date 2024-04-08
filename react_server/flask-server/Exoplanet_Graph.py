@@ -29,6 +29,7 @@ from tsfresh.utilities.dataframe_functions import make_forecasting_frame
 from tsfresh.utilities.dataframe_functions import impute
 from statsmodels.tsa.seasonal import seasonal_decompose
 import tempfile
+from astroquery.mast import Catalogs
 
 
 app = Flask(__name__)
@@ -132,6 +133,104 @@ def serve_image(filename):
 def get_archive():
     archive = pd.read_csv('../../../ExoVision/Datasets/updated_database_exoplanet.csv')[['tid','confirmed_planet']]
     return jsonify(archive.to_dict(orient='records'))
+
+@app.route('/api/planet_meta/<identifier>/metadata')
+def get_metadata(identifier):
+    if identifier[0:4] == "TIC ":
+        catalog_data = Catalogs.query_criteria(catalog="Tic", ID=int(identifier[4:]))
+        catalog_data = catalog_data.to_pandas().fillna(0)
+        if(len(catalog_data)==0):
+            return jsonify({})
+        catalog = {
+            'Unique identifier': catalog_data['ID'].values[0],
+            'Type of object': catalog_data['objType'].values[0],
+            'Source of object type': catalog_data['typeSrc'].values[0],
+            'Right Ascension': catalog_data['ra'].values[0],
+            'Declination': catalog_data['dec'].values[0],
+            'Parallax measurement': catalog_data['plx'].values[0],
+            'Nearest neighbor distance': catalog_data['prox'].values[0],
+            'TESS band magnitude': catalog_data['Tmag'].values[0],
+            'Surface temperature': catalog_data['Teff'].values[0],
+            'Surface gravity': catalog_data['logg'].values[0],
+            'Metal content': catalog_data['MH'].values[0],
+            'Stellar radius': catalog_data['rad'].values[0],
+            'Stellar mass': catalog_data['mass'].values[0],
+            'Stellar density': catalog_data['rho'].values[0],
+            'Stellar luminosity': catalog_data['lum'].values[0],
+            'Distance to star': catalog_data['d'].values[0]
+        }
+        return jsonify(catalog)
+    else:
+        return jsonify({})
+
+@app.route('/api/planet_meta/<identifier>/lightcurves')
+def get_metadata_lightcurve(identifier):
+    sectorsdata = lk.search_lightcurve(identifier, author=["TESS-SPOC"], exptime=1800)
+    if(len(sectorsdata.table)==0):
+        return jsonify({})
+    search_data = sectorsdata.table.to_pandas(index=False).replace({np.nan: None})
+            
+    search = {
+        'intentType': search_data['intentType'].values.tolist(),
+        'obs_collect§ion': search_data['obs_collection'].values.tolist(),
+        'provenance_name': search_data['provenance_name'].values.tolist(),
+        'instrument§_name': search_data['instrument_name'].values.tolist(),
+        'project': search_data['project'].values.tolist(),
+        'filters': search_data['filters'].values.tolist(),
+        'wavelength_region': search_data['wavelength_region'].values.tolist(),
+        'target_name': search_data['target_name'].values.tolist(),
+        'target_classification': search_data['target_classification'].values.tolist(),
+        'obs_id': search_data['obs_id'].values.tolist(),
+        's_ra': search_data['s_ra'].values.tolist(),
+        's_dec': search_data['s_dec'].values.tolist(),
+        'dataproduct_type': search_data['dataproduct_type'].values.tolist(),
+        'proposal_pi': search_data['proposal_pi'].values.tolist(),
+        'calib_level': search_data['calib_level'].values.tolist(),
+        't_min': search_data['t_min'].values.tolist(),
+        't_max': search_data['t_max'].values.tolist(),
+        't_exptime': search_data['t_exptime'].values.tolist(),
+        'em_min': search_data['em_min'].values.tolist(),
+        'em_max': search_data['em_max'].values.tolist(),
+        'obs_title': search_data['obs_title'].values.tolist(),
+        't_obs_release': search_data['t_obs_release'].values.tolist(),
+        'proposal_id': search_data['proposal_id'].values.tolist(),
+        'proposal_type': search_data['proposal_type'].values.tolist(),
+        'sequence_number': search_data['sequence_number'].values.tolist(),
+        's_region': search_data['s_region'].values.tolist(),
+        'jpegURL': search_data['jpegURL'].values.tolist(),
+        'dataURL': search_data['dataURL'].values.tolist(),
+        'dataRights': search_data['dataRights'].values.tolist(),
+        'mtFlag': search_data['mtFlag'].values.tolist(),
+        'srcDen': search_data['srcDen'].values.tolist(),
+        'obsid': search_data['obsid'].values.tolist(),
+        'objID': search_data['objID'].values.tolist(),
+        'exptime': search_data['exptime'].values.tolist(),
+        'distance': search_data['distance'].values.tolist(),
+        'obsID': search_data['obsID'].values.tolist(),
+        'obs_collection_products': search_data['obs_collection_products'].values.tolist(),
+        'dataproduct_type_products': search_data['dataproduct_type_products'].values.tolist(),
+        'description': search_data['description'].values.tolist(),
+        'type': search_data['type'].values.tolist(),
+        'dataURI': search_data['dataURI'].values.tolist(),
+        'productType': search_data['productType'].values.tolist(),
+        'productGroupDescription': search_data['productGroupDescription'].values.tolist(),
+        'productSubGroupDescription': search_data['productSubGroupDescription'].values.tolist(),
+        'productDocumentationURL': search_data['productDocumentationURL'].values.tolist(),
+        'project_products': search_data['project_products'].values.tolist(),
+        'prvversion': search_data['prvversion'].values.tolist(),
+        'proposal_id_products': search_data['proposal_id_products'].values.tolist(),
+        'productFilename': search_data['productFilename'].values.tolist(),
+        'size': search_data['size'].values.tolist(),
+        'parent_obsid': search_data['parent_obsid'].values.tolist(),
+        'dataRights_products': search_data['dataRights_products'].values.tolist(),
+        'calib_level_products': search_data['calib_level_products'].values.tolist(),
+        'author': search_data['author'].values.tolist(),
+        'mission': search_data['mission'].values.tolist(),
+        'year': search_data['year'].values.tolist(),
+        'sort_order': search_data['sort_order'].values.tolist(),
+    }
+    return search
+
 
 if __name__ == "__main__":
     app.run(debug=True)
