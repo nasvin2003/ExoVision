@@ -15,8 +15,8 @@ from sklearn.tree import DecisionTreeClassifier
 from keras.models import load_model
 from keras.optimizers import Adam
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Conv1D, MaxPooling1D, Flatten
+from keras.models import Model, Sequential
+from keras.layers import Input, Dense, Conv1D, Flatten, MaxPooling1D, Concatenate, Dropout
 from wotan import slide_clip
 from wotan import transit_mask, flatten
 from astropy.stats import sigma_clip
@@ -30,6 +30,8 @@ from tsfresh.utilities.dataframe_functions import impute
 from statsmodels.tsa.seasonal import seasonal_decompose
 import tempfile
 from astroquery.mast import Catalogs
+from tslearn.preprocessing import TimeSeriesResampler
+from sklearn.preprocessing import MinMaxScaler
 
 
 app = Flask(__name__)
@@ -49,70 +51,73 @@ def plot_graphs(identifier):
             i.flux = i.pdcsap_flux.value.unmasked
             i.flux_err = i.pdcsap_flux_err.value.unmasked
             
-        stiched_lc = sectors.stitch()
+        stitched_lc = sectors.stitch()
 
-        time = stiched_lc['time'].value
-        flux = stiched_lc['pdcsap_flux'].value
-        
-        flatten_lc, trend_lc = flatten(time, flux, method='biweight', return_trend=True) 
+        time = stitched_lc['time'].value
+        flux = stitched_lc['pdcsap_flux'].value
 
         plt.figure(figsize=(9.10, 2.15))
-        plt.plot(time,flatten_lc, color="#FF4C29")
+        plt.plot(time,flux, color="#FF4C29")
         plt.gcf().set_facecolor('#202123')  # Set background color of the figure
         plt.grid(False)
         plt.axis('off')
         plt.savefig(general_plot_path)
         plt.close()
 
-        lightc = lk.LightCurve(time = time,flux = flatten_lc)
-
-        min_period = 0.5  
-        max_period = 100.0  
-        num_periods = 1000 
-
+        min_period = 1
+        max_period = 1000
+        num_periods = 10000
         period_time = np.logspace(np.log10(min_period), np.log10(max_period), num_periods)
-
-        bls_periodogram = lightc.to_periodogram(method='bls', period=period_time)
-
+        bls_periodogram = stitched_lc.to_periodogram(method='bls', period=period_time)
         planet_period = bls_periodogram.period_at_max_power
         planet_t0 = bls_periodogram.transit_time_at_max_power
-        planet_duration = bls_periodogram.duration_at_max_power
+        folded_light_curve = stitched_lc.fold(period=planet_period, epoch_time=planet_t0)
+        flatten_lc, trend_lc = flatten(folded_light_curve.time.value, folded_light_curve.flux, method='biweight', return_trend=True)
+        light = pd.DataFrame({'Time':folded_light_curve.time.value,'Flux':flatten_lc}).dropna()
+        flux_series = pd.Series([i[0] for i in light[['Flux']].to_numpy()], index=[i[0] for i in light[['Time']].to_numpy()])
+        decompose_result_mult = seasonal_decompose(flux_series, model="additive", period=int(planet_period.value))
+        trend = TimeSeriesResampler(sz=10000).fit_transform(np.array(decompose_result_mult.trend))[0]
+        
+        status = 0
+        model = input_flux = Input(shape=(10000,1))
+        x = Conv1D(filters=64, kernel_size=3, activation='relu')(input_flux)
+        x = MaxPooling1D(pool_size=2)(x)
+        x = Conv1D(filters=64, kernel_size=5, activation='relu')(x)
+        x = MaxPooling1D(pool_size=2)(x)
+        x = Conv1D(filters=64, kernel_size=5, activation='relu')(x)
+        x = MaxPooling1D(pool_size=2)(x)
+        x = Flatten()(x)
+        x = Dropout(0.75)(x)
+        model_flux = Model(inputs=input_flux, outputs=x)
 
-        folded_light_curve = lightc.fold(period=planet_period, epoch_time=planet_t0)
+        input_params = Input(shape=(11,))
+        y = Dense(128, activation='relu')(input_params)
+        model_params = Model(inputs=input_params, outputs=y)
 
-        duration_days = planet_duration.value
+        combined = Concatenate()([model_flux.output, model_params.output])
+        z = Dropout(0.5)(combined)
+        z = Dense(128, activation='relu')(z)
+        final_output = Dense(1, activation='sigmoid')(z)
 
-        folded_light_curve_time = folded_light_curve.time
-
-        t = pd.DataFrame({'Time': folded_light_curve_time.value, 'Flux': folded_light_curve.flux.value})
-        t = t.reset_index()
-        temp = t[len(t.sort_values(by='Time'))//2-500:len(t.sort_values(by='Time'))//2+500]
-        temp = temp.reset_index()
-
-        time_index = folded_light_curve_time.value
-
-        mean_flux = np.nanmean(folded_light_curve.flux)
-        flux_values_filled = np.nan_to_num(folded_light_curve.flux, nan=mean_flux)
-
-        flux_series = pd.Series(flux_values_filled, index=time_index)
-
-        per_val = int(planet_period.value)
-        if per_val == 0:
-            per_val = 1
-
-        decompose_result_mult = seasonal_decompose(flux_series, model="additive", period=per_val)
-
-        trend = decompose_result_mult.trend
-        seasonal = decompose_result_mult.seasonal
-        residual = decompose_result_mult.resid
-
-        t = pd.DataFrame({'Time': trend.index, 'Flux': trend})
-        t = t.reset_index()
-        temp1 = t[len(t)//2-500:len(t)//2+500]  
-        temp1.reset_index()
-
+        model = Model(inputs=[model_flux.input, model_params.input], outputs=final_output)
+        
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        
+        model.load_weights('../../Models/model_weights_v5.h5')
+        
+        catalog_data = Catalogs.query_criteria(catalog="Tic", ID=int(identifier[4:]))[['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']].to_pandas().fillna(0)
+        
+        scaler = MinMaxScaler()
+        catalog_data = scaler.fit_transform(catalog_data)
+    
+        status_val = model.predict([trend.reshape(1, 10000, 1), catalog_data.reshape(1, -1)], verbose=0)
+        if status_val == 1:
+            status = "Potential Exoplanet Candidate"
+        else:
+            status = "No Exoplanet Transit Signals Detected"
+        
         plt.figure(figsize=(9.10, 2.15))
-        plt.plot(temp1.Time, temp1.Flux, color="#FF4C29")
+        plt.plot(range(10000), trend, color="#FF4C29")
         plt.gcf().set_facecolor('#202123')  # Set background color of the figure
         plt.grid(False)
         plt.axis('off')
@@ -121,8 +126,10 @@ def plot_graphs(identifier):
 
         return jsonify({
         'general_plot_url': f'/api/images/{identifier}_general_plot.png',
-        'trend_plot_url': f'/api/images/{identifier}_trend_plot.png'
+        'trend_plot_url': f'/api/images/{identifier}_trend_plot.png',
+        'status': status
     })
+
 
 @app.route('/api/images/<filename>')
 def serve_image(filename):
@@ -131,7 +138,7 @@ def serve_image(filename):
 
 @app.route('/api/archive')
 def get_archive():
-    archive = pd.read_csv('../../../ExoVision/Datasets/updated_database_exoplanet.csv')[['tid','confirmed_planet']]
+    archive = pd.read_csv('../../../ExoVision/Datasets/final_dataset.csv')[['tid','confirmed_planet']]
     return jsonify(archive.to_dict(orient='records'))
 
 @app.route('/api/planet_meta/<identifier>/metadata')

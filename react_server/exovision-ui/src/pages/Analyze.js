@@ -15,6 +15,7 @@ const Analyze = () => {
                     setPlotUrls({
                         generalPlotUrl: data.general_plot_url,
                         trendPlotUrl: data.trend_plot_url,
+                        status: data.status,
                     });
                 });
         }
@@ -45,7 +46,7 @@ const Analyze = () => {
                                     paddingLeft: "15px",
                                 }}
                             >
-                                Planet ID:{" "}
+                                Planet ID: <span style={{color:"#FF4C29"}}>{tid}</span>
                             </span>
                         </div>
                         <div
@@ -67,7 +68,7 @@ const Analyze = () => {
                                     paddingLeft: "15px",
                                 }}
                             >
-                                Exoplanet Status:{" "}
+                                Exoplanet Status: <span  style={{color:"#FF4C29"}}>{plotUrls.status}</span>
                             </span>
                         </div>
                     </div>
@@ -81,7 +82,7 @@ const Analyze = () => {
                         <div className="container-text">
                             <h2 className="graph-text">Transit Trend Visualisation</h2>
                         </div>
-                        {plotUrls.trendPlotUrl && <img src={plotUrls.trendPlotUrl} alt="Trend Plot" />}
+                        {plotUrls.trendPlotUrl && <img src={plotUrls.trendPlotUrl} style={{height:"100%"}} alt="Trend Plot" />}
                     </div>
                 </div>
             ) : (
