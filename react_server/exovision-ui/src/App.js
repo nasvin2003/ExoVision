@@ -1,6 +1,6 @@
 import "./App.css";
 import "boxicons/css/boxicons.min.css";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import Blank from "./pages/Blank";
 import Analyze from "./pages/Analyze";
