@@ -13,15 +13,4 @@ Exoplanet_Dataset_Preperation.ipynb
 ExoVision_Model_Backup.ipynb
 Datasets/
 react_server/exovision-ui/node_modules/
-react_server/exovision-ui/.pnp
-react_server/exovision-ui/.pnp.js
-react_server/exovision-ui/coverage
-react_server/exovision-ui/.DS_Store
-react_server/exovision-ui/.env.local
-react_server/exovision-ui/.env.development.local
-react_server/exovision-ui/.env.test.local
-react_server/exovision-ui/.env.production.local
-react_server/exovision-ui/npm-debug.log*
-react_server/exovision-ui/yarn-debug.log*
-react_server/exovision-ui/yarn-error.log*
 react_server/flask-server/venv/
