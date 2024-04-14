@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
+import Modal from "react-modal";
+ 
 const Search = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [hover, setHover] = useState(false);
-
+    const [hover1, setHover1] = useState(false);
     const [search, setSearch] = useState(true);
-
     const [vis, setVis] = useState(false);
+
+    const [hover2, setHover2] = useState(false);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
+
+    Modal.setAppElement("#root");
+
+    const navigate = useNavigate();
 
     const defaultVal = {
         intentType: { 0: "" },
@@ -73,7 +93,7 @@ const Search = () => {
         "Type of object": "",
         "Source of object type": "",
         "Right Ascension": "",
-        "Declination": "",
+        Declination: "",
         "Parallax measurement": "",
         "Nearest neighbor distance": "",
         "TESS band magnitude": "",
@@ -89,6 +109,7 @@ const Search = () => {
 
     const [dataframe, setDataframe] = useState([defaultVal]);
     const [dataframe1, setDataframe1] = useState([defaultVal1]);
+    const [red, setRed] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             if (searchTerm === "") {
@@ -106,9 +127,11 @@ const Search = () => {
                 const metaDataResponse = await fetch(`/api/planet_meta/${searchTerm}/metadata`);
                 const metaData = await metaDataResponse.json();
                 setDataframe1([normalizeData(metaData, defaultVal1)]);
+                setRed(true);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
                 // Handle errors or set default values
+                setRed(false);
             }
         };
 
@@ -122,7 +145,6 @@ const Search = () => {
         });
         return normalized;
     }
-
     function processData(dataframe) {
         if (dataframe.length === 0) {
             return [];
@@ -225,6 +247,41 @@ const Search = () => {
                     </button>
                 </div>
 
+                <div
+                    style={{
+                        height: "7vh",
+                        width: "15vw",
+                        zIndex: 1,
+                        position: "fixed",
+                        display: "flex",
+                        justifySelf: "center",
+                        marginTop: "11.5vh",
+                        marginLeft: "63.5vw",
+                    }}
+                >
+                    <button
+                        style={{
+                            alignSelf: "center",
+                            backgroundColor: "#000000",
+                            borderColor: hover1 ? "#ff4c29" : "#202123",
+                            height: "100%",
+                            width: "100%",
+                            borderRadius: "15px",
+                        }}
+                        onMouseOver={() => setHover1(true)}
+                        onMouseOut={() => setHover1(false)}
+                        onClick={() => {
+                            if (red) {
+                                navigate(`/analyze/${searchTerm}`);
+                            }
+                        }}
+                    >
+                        <span style={{ color: "#ffffff", fontSize: "large", fontFamily: "Montserrat" }}>
+                            View Light Curve
+                        </span>
+                    </button>
+                </div>
+
                 <div style={{ height: "30vh", width: "30vw", marginTop: "15vh", marginLeft: "-45vw" }}>
                     {dataframe1.map((row, index) => (
                         <span style={{ display: "flex", flexDirection: "column" }}>
@@ -316,6 +373,161 @@ const Search = () => {
                 </div>
             </div>
             <ScrollableTable data={dataframe} />
+            <button
+                style={{
+                    height: "8vh",
+                    width: "8vh",
+                    backgroundColor: "#000000",
+                    marginTop: "3vh",
+                    marginLeft: "95vw",
+                    position: "fixed",
+                    display: "flex",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    borderRadius: "100px",
+                    border: "solid",
+                    borderColor: hover2 ? "#ff4c29" : "#000000",
+                }}
+                onMouseOver={() => setHover2(true)}
+                onMouseOut={() => setHover2(false)}
+                onClick={openModal}
+            >
+                <span
+                    style={{
+                        color: "white",
+                        fontSize: "5vh",
+                        marginTop: "0.5vh",
+                        textAlign: "center",
+                        alignSelf: "center",
+                    }}
+                >
+                    {React.createElement("i", { className: "bx bx-info-circle" })}
+                </span>
+            </button>
+            <Modal
+                isOpen={modalIsOpen}
+                onAfterOpen={afterOpenModal}
+                onRequestClose={closeModal}
+                style={{
+                    overlay: {
+                        backgroundColor: "#202123",
+                        zIndex: 1000,
+                        opacity: 0.9,
+                        height: "100vh",
+                        width: "100vw",
+                        display: "flex",
+                        alignItems: "center",
+                    },
+                    content: {
+                        color: "black",
+                        backgroundColor: "black",
+                        height: "70vh",
+                        width: "70vw",
+                        borderRadius: "10px",
+                        margin: "auto",
+                    },
+                }}
+            >
+                <div
+                    style={{
+                        color: "white",
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        padding: "30px",
+                    }}
+                >
+                    <span style={{ textAlign: "center", fontSize: "30px", fontWeight: "bold" }}>INFORMATION</span>
+                    <span
+                        style={{
+                            fontSize: "25px",
+                            marginTop: "30px",
+                            marginBottom: "20px",
+                            fontWeight: "bold",
+                            color: "#ff4c29",
+                        }}
+                    >
+                        About this page
+                    </span>
+                    <span style={{ fontSize: "20px" }}>This page is the search page.</span>
+                    <span style={{ fontSize: "20px" }}>It allows you to search for a star by its TIC number.</span>
+                    <span style={{ fontSize: "20px" }}>
+                        Once you have entered the TIC number, you can view the light curve of the star.
+                    </span>
+                    <span style={{ fontSize: "20px" }}>It also provides information about the star.</span>
+                    <span style={{ fontSize: "20px" }}>
+                        Click on the "View Light Curve" button to view the light curve of the star.
+                    </span>
+
+                    <span
+                        style={{
+                            fontSize: "25px",
+                            marginTop: "20px",
+                            marginBottom: "20px",
+                            fontWeight: "bold",
+                            color: "#ff4c29",
+                        }}
+                    >
+                        About the light curve
+                    </span>
+                    <span style={{ fontSize: "20px" }}>
+                        The light curve shows the brightness of the star over time.
+                    </span>
+                    <span style={{ fontSize: "20px" }}>It is a graph of the star's magnitude against time.</span>
+                    <span style={{ fontSize: "20px" }}>It is used to study the star's variability.</span>
+
+                    <span
+                        style={{
+                            fontSize: "25px",
+                            marginTop: "20px",
+                            marginBottom: "20px",
+                            fontWeight: "bold",
+                            color: "#ff4c29",
+                        }}
+                    >
+                        About the star
+                    </span>
+                    <span style={{ fontSize: "20px" }}>The star's information is displayed in the table.</span>
+                    <span style={{ fontSize: "20px" }}>
+                        It includes details about the star's type, temperature, and distance.
+                    </span>
+
+                    <span
+                        style={{
+                            fontSize: "25px",
+                            marginTop: "20px",
+                            marginBottom: "20px",
+                            fontWeight: "bold",
+                            color: "#ff4c29",
+                        }}
+                    >
+                        Common Question
+                    </span>
+                    <span style={{ fontSize: "20px", marginBottom: "20px" }}>1. What is the TIC number?</span>
+                    <span style={{ fontSize: "20px" }}>
+                        The TIC number is the unique identifier of a star in the TESS Input Catalog.
+                    </span>
+                    <span style={{ fontSize: "20px" }}>
+                        It is used to identify the star and retrieve information about it.
+                    </span>
+                    <button
+                        style={{
+                            backgroundColor: "black",
+                            color: "white",
+                            height: "7%",
+                            width: "30%",
+                            alignSelf: "center",
+                            fontSize: "20px",
+                            borderRadius: "10px",
+                            marginTop: "30px",
+                        }}
+                        onClick={closeModal}
+                    >
+                        Close
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 };

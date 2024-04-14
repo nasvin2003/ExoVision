@@ -21,9 +21,9 @@ const Home = () => {
                 <video
                     autoPlay
                     muted
-                    style={{ width: "100vw", height: "100vh", objectFit: "cover", position: "fixed" }}
+                    style={{ width: "100%", height: "99.5%", objectFit: "cover", position: "fixed" }}
                 >
-                    <source src={'/public/bg.mp4'} type="video/mp4" />
+                    <source src={`${process.env.PUBLIC_URL}/bg.mp4`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -66,6 +66,9 @@ const Home = () => {
                     </div>
                     <div className="nav__button__home" onClick={() => navigate(`/archive`)}>
                         <span style={{ fontSize: "30px" }}>Browse Star Archive</span>
+                    </div>
+                    <div className="nav__button__home" onClick={() => navigate(`/upload`)}>
+                        <span style={{ fontSize: "30px" }}>Custom Analysis of FITS</span>
                     </div>
                 </div>
             </div>

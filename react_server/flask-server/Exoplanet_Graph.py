@@ -1,7 +1,7 @@
 import sys
 import os
 import time
-from flask import Flask, send_file, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from lightkurve import search_targetpixelfile
 from lightkurve import TessTargetPixelFile
 import lightkurve as lk
@@ -33,9 +33,15 @@ from astroquery.mast import Catalogs
 from tslearn.preprocessing import TimeSeriesResampler
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
+from astropy.time import Time
+import astropy.io.fits as fits
 import pyodbc
+import logging
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app) 
 
 @app.route('/api/graphs/<identifier>/general', methods=['GET'])
 def plot_graphs(identifier):
@@ -262,10 +268,115 @@ def get_metadata_lightcurve(identifier):
     }
     return search
 
-@app.route('/')
-def home():
-    return "Welcome to the API. Use /api/... to interact with it."
-    
+@app.route('/upload', methods=['POST', 'GET'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"})
+    file = request.files['file']
+    # print(file)
+    if file.filename == '':
+        return jsonify({"error": "No selected file"})
+    if file and file.filename.endswith('.fits'):
+        temp_dir = tempfile.mkdtemp()
+        file_path = os.path.join(temp_dir, file.filename)
+        
+        file.save(file_path)
+        temp = process_file(file_path)
+        return temp
+    return jsonify({"error": "Invalid file format"})
+
+def process_file(file):
+    images_dir = os.path.join(tempfile.gettempdir(), 'plot_images')
+    os.makedirs(images_dir, exist_ok=True)
+
+    general_plot_path = os.path.join(images_dir, f'custom_general_plot.png')
+    trend_plot_path = os.path.join(images_dir, f'custom_trend_plot.png')
+    try:
+        with fits.open(file) as hdulist:
+            time = hdulist[1].data['TIME'].astype(float)
+            flux = hdulist[1].data['PDCSAP_FLUX'].astype(float)
+            error = hdulist[1].data['PDCSAP_FLUX_ERR'].astype(float)
+
+            finite_mask = np.isfinite(time) & np.isfinite(flux) & np.isfinite(error)
+            time, flux, error = time[finite_mask], flux[finite_mask], error[finite_mask]
+            
+            lc = lk.LightCurve(time=Time(time, format='jd'), flux=flux, flux_err=error)
+
+            # Simple example o folding and plotting
+            period = 10  # This should be determined via analysis such as BLS
+            folded_lc = lc.fold(period=period)
+            plt.figure()
+            plt.plot(folded_lc.time.value, folded_lc.flux, 'k.')
+            plt.xlabel('Phase')
+            plt.ylabel('Flux')
+            plt.title('Folded Light Curve')
+            plt.savefig(general_plot_path)
+            plt.close()
+        
+            stitched_lc = lc
+            min_period = 1
+            max_period = 1000
+            num_periods = 10000
+            period_time = np.logspace(np.log10(min_period), np.log10(max_period), num_periods)
+            bls_periodogram = stitched_lc.to_periodogram(method='bls', period=period_time)
+            planet_period = bls_periodogram.period_at_max_power
+            planet_t0 = bls_periodogram.transit_time_at_max_power
+            folded_light_curve = stitched_lc.fold(period=planet_period)
+            flatten_lc, trend_lc = flatten(folded_light_curve.time.value, folded_light_curve.flux, method='biweight', return_trend=True)
+            light = pd.DataFrame({'Time':folded_light_curve.time.value,'Flux':flatten_lc}).dropna()
+            flux_series = pd.Series([i[0] for i in light[['Flux']].to_numpy()], index=[i[0] for i in light[['Time']].to_numpy()])
+            decompose_result_mult = seasonal_decompose(flux_series, model="additive", period=int(planet_period.value))
+            trend = TimeSeriesResampler(sz=10000).fit_transform(np.array(decompose_result_mult.trend))[0]
+            
+            status = 0
+            model = input_flux = Input(shape=(10000,1))
+            x = Conv1D(filters=64, kernel_size=3, activation='relu')(input_flux)
+            x = MaxPooling1D(pool_size=2)(x)
+            x = Conv1D(filters=64, kernel_size=5, activation='relu')(x)
+            x = MaxPooling1D(pool_size=2)(x)
+            x = Conv1D(filters=64, kernel_size=5, activation='relu')(x)
+            x = MaxPooling1D(pool_size=2)(x)
+            x = Flatten()(x)
+            x = Dropout(0.75)(x)
+            model_flux = Model(inputs=input_flux, outputs=x)
+
+            input_params = Input(shape=(11,))
+            y = Dense(128, activation='relu')(input_params)
+            model_params = Model(inputs=input_params, outputs=y)
+
+            combined = Concatenate()([model_flux.output, model_params.output])
+            z = Dropout(0.5)(combined)
+            z = Dense(128, activation='relu')(z)
+            final_output = Dense(1, activation='sigmoid')(z)
+
+            model = Model(inputs=[model_flux.input, model_params.input], outputs=final_output)
+            
+            model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+            
+            model.load_weights('../../Models/model_weights_v5.h5')
+
+            status_val = model.predict([trend.reshape(1, 10000, 1), np.array([0,0,0,0,0,0,0,0,0,0,0]).reshape(1, -1)])
+            if status_val == 1:
+                status = "Potential Exoplanet Candidate"
+            else:
+                status = "No Exoplanet Transit Signals Detected"
+            
+            if status == "Potential Exoplanet Candidate" or status == "No Exoplanet Transit Signals Detected":
+                plt.figure(figsize=(9.10, 2.15))
+                plt.plot(range(10000), trend, color="#FF4C29")
+                plt.gcf().set_facecolor('#202123')  # Set background color of the figure
+                plt.grid(False)
+                plt.axis('off')
+                plt.savefig(trend_plot_path)
+                plt.close()
+
+                return {
+                'general_plot_url': f'/api/images/custom_general_plot.png',
+                'trend_plot_url': f'/api/images/custom_trend_plot.png',
+                'status': status
+                }
+    except Exception as e:
+        return {"error": str(e)}
+
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 8080))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True)

@@ -7,6 +7,7 @@ import Analyze from "./pages/Analyze";
 import Archive from "./pages/Archive";
 import Home from "./pages/Home";
 import Search from "./pages/Search"
+import Upload from "./pages/Upload";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                         <Route path="/search" element={<Search />} />
                         <Route path="/analyze/:tid" element={<Analyze />} />
                         <Route path="/archive" element={<Archive />} />
+                        <Route path="/upload" element={<Upload />} />
                         <Route path="/settings" element={<Blank />} />
                     </Route>
                 </Routes>

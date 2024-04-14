@@ -27,6 +27,12 @@ const sidebarNavItems = [
         to: "/archive",
         section: "archive",
     },
+    {
+        display: "Custom Analysis",
+        icon: React.createElement("i", { className: "bx bx-bot" }),
+        to: "/upload",
+        section: "upload",
+    },
 ];
 
 const settingsItem = {
@@ -99,7 +105,7 @@ const Sidebar = () => {
     
             <div className="sidebar__menu sidebar__menu--settings" ref={settingsRef}>
                 <Link to={settingsItem.to}>
-                    <div className={`sidebar__menu__item ${activeIndex === sidebarNavItems.length ? " active" : ""}`}> {/* Corrected the space before "active" */}
+                    <div className={`sidebar__menu__item ${activeIndex === sidebarNavItems.length ? " active" : ""}`}>
                         <div className="sidebar__menu__item__icon">{settingsItem.icon}</div>
                         <div className="sidebar__menu__item__text">{settingsItem.display}</div>
                     </div>
