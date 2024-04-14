@@ -32,9 +32,11 @@ import tempfile
 from astroquery.mast import Catalogs
 from tslearn.preprocessing import TimeSeriesResampler
 from sklearn.preprocessing import MinMaxScaler
-
+import pandas as pd
+import pyodbc
 
 app = Flask(__name__)
+
 @app.route('/api/graphs/<identifier>/general', methods=['GET'])
 def plot_graphs(identifier):
 
@@ -138,7 +140,29 @@ def serve_image(filename):
 
 @app.route('/api/archive')
 def get_archive():
-    archive = pd.read_csv('../../../ExoVision/Datasets/final_dataset.csv')[['tid','confirmed_planet']]
+    server = 'exovision.database.windows.net'
+    database = 'exovision-starlist'
+    username = 'exovision'
+    password = 'password@123'
+
+    cnxn = pyodbc.connect(
+        'DRIVER={ODBC Driver 18 for SQL Server};'
+        'SERVER=' + server + ';'
+        'DATABASE=' + database + ';'
+        'UID=' + username + ';'
+        'PWD=' + password
+    )
+
+    crsr = cnxn.cursor()
+
+    crsr.execute("SELECT * FROM exovision_stars")
+
+    row = crsr.fetchall()
+    archive = pd.DataFrame([[i[0],i[1],i[2]] for i in row], columns=[i[0] for i in crsr.description])
+    archive.reset_index(drop=True, inplace=True)
+
+    crsr.close()
+    cnxn.close()
     return jsonify(archive.to_dict(orient='records'))
 
 @app.route('/api/planet_meta/<identifier>/metadata')
@@ -238,6 +262,10 @@ def get_metadata_lightcurve(identifier):
     }
     return search
 
-
+@app.route('/')
+def home():
+    return "Welcome to the API. Use /api/... to interact with it."
+    
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)

@@ -2,14 +2,14 @@
 
 @font-face {
     font-family: "Montserrat";
-    src: url("../components/fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
+    src: url('/src/components/fonts/Montserrat/static/Montserrat-Regular.ttf') format("truetype");
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: "Montserrat-Bold";
-    src: url("../components/fonts/Montserrat/static/Montserrat-MediumItalic.ttf") format("truetype");
+    src: url('/src/components/fonts/Montserrat/static/Montserrat-MediumItalic.ttf') format("truetype");
     font-weight: normal;
     font-style: normal;
 }

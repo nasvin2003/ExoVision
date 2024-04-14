@@ -44,7 +44,7 @@ function Archive() {
             </div>
             {filteredData.length > 0 ? (
                 filteredData.map((item) => (
-                    <div className="archive-container" key={item.tid} onClick={() => navigate(`/analyze/${item.tid}`)}>
+                    <div className="archive-container" key={item.index} onClick={() => navigate(`/analyze/${item.tid}`)}>
                         {item.confirmed_planet === 1 ? (
                             <div className="archive-container-exo">
                                 <p className="archive-text">{item.tid}</p>

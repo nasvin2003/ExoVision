@@ -23,7 +23,7 @@ const Home = () => {
                     muted
                     style={{ width: "100vw", height: "100vh", objectFit: "cover", position: "fixed" }}
                 >
-                    <source src={`${process.env.PUBLIC_URL}/bg.mp4`} type="video/mp4" />
+                    <source src={'/public/bg.mp4'} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             </div>

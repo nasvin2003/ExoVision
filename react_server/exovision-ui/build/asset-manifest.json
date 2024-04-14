@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/ExoVision/react_server/exovision-ui/static/css/main.573ecd50.css",
-    "main.js": "/ExoVision/react_server/exovision-ui/static/js/main.6a6a0b08.js",
-    "static/js/592.3abccfcc.chunk.js": "/ExoVision/react_server/exovision-ui/static/js/592.3abccfcc.chunk.js",
-    "static/media/boxicons.svg": "/ExoVision/react_server/exovision-ui/static/media/boxicons.9e2b21b135bc7d4c803f.svg",
-    "static/media/boxicons.eot": "/ExoVision/react_server/exovision-ui/static/media/boxicons.65a8ce52fc5427e8f94d.eot",
-    "static/media/boxicons.woff": "/ExoVision/react_server/exovision-ui/static/media/boxicons.d12afc36557395143e4b.woff",
-    "static/media/boxicons.ttf": "/ExoVision/react_server/exovision-ui/static/media/boxicons.db9ddb1898dbd76badca.ttf",
-    "static/media/Montserrat-MediumItalic.ttf": "/ExoVision/react_server/exovision-ui/static/media/Montserrat-MediumItalic.67e6dda3939a21720991.ttf",
-    "static/media/Montserrat-Regular.ttf": "/ExoVision/react_server/exovision-ui/static/media/Montserrat-Regular.24785cc015b27a3e964b.ttf",
-    "static/media/boxicons.woff2": "/ExoVision/react_server/exovision-ui/static/media/boxicons.df635aaf04cd75132f62.woff2",
-    "index.html": "/ExoVision/react_server/exovision-ui/index.html",
-    "main.573ecd50.css.map": "/ExoVision/react_server/exovision-ui/static/css/main.573ecd50.css.map",
-    "main.6a6a0b08.js.map": "/ExoVision/react_server/exovision-ui/static/js/main.6a6a0b08.js.map",
-    "592.3abccfcc.chunk.js.map": "/ExoVision/react_server/exovision-ui/static/js/592.3abccfcc.chunk.js.map"
+    "main.css": "/static/css/main.a55eedbb.css",
+    "main.js": "/static/js/main.f4b2ffe0.js",
+    "static/js/592.3abccfcc.chunk.js": "/static/js/592.3abccfcc.chunk.js",
+    "static/media/boxicons.svg": "/static/media/boxicons.9e2b21b135bc7d4c803f.svg",
+    "static/media/boxicons.eot": "/static/media/boxicons.65a8ce52fc5427e8f94d.eot",
+    "static/media/boxicons.woff": "/static/media/boxicons.d12afc36557395143e4b.woff",
+    "static/media/boxicons.ttf": "/static/media/boxicons.db9ddb1898dbd76badca.ttf",
+    "static/media/Montserrat-MediumItalic.ttf": "/static/media/Montserrat-MediumItalic.67e6dda3939a21720991.ttf",
+    "static/media/Montserrat-Regular.ttf": "/static/media/Montserrat-Regular.24785cc015b27a3e964b.ttf",
+    "static/media/boxicons.woff2": "/static/media/boxicons.df635aaf04cd75132f62.woff2",
+    "index.html": "/index.html",
+    "main.a55eedbb.css.map": "/static/css/main.a55eedbb.css.map",
+    "main.f4b2ffe0.js.map": "/static/js/main.f4b2ffe0.js.map",
+    "592.3abccfcc.chunk.js.map": "/static/js/592.3abccfcc.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.573ecd50.css",
-    "static/js/main.6a6a0b08.js"
+    "static/css/main.a55eedbb.css",
+    "static/js/main.f4b2ffe0.js"
   ]
 }

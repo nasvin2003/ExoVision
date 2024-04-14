@@ -24,7 +24,7 @@ const Analyze = () => {
     return (
         <div className="app-container">
             {tid !== "empty" ? (
-                <div>
+                <div style={{marginTop:"5vh"}}>
                     <div style={{ display: "flex", height: "7vh", marginBottom: "20px", width: "100%" }}>
                         <div
                             style={{
