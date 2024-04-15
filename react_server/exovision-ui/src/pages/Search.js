@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
- 
+
 const Search = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [hover, setHover] = useState(false);
@@ -110,6 +110,7 @@ const Search = () => {
     const [dataframe, setDataframe] = useState([defaultVal]);
     const [dataframe1, setDataframe1] = useState([defaultVal1]);
     const [red, setRed] = useState(false);
+    const [loader, setLoader] = useState(0);
     useEffect(() => {
         const fetchData = async () => {
             if (searchTerm === "") {
@@ -120,6 +121,7 @@ const Search = () => {
             }
 
             try {
+                setLoader(0.8);
                 const lightCurvesResponse = await fetch(`/api/planet_meta/${searchTerm}/lightcurves`);
                 const lightCurvesData = await lightCurvesResponse.json();
                 setDataframe([normalizeData(lightCurvesData, defaultVal)]);
@@ -128,8 +130,10 @@ const Search = () => {
                 const metaData = await metaDataResponse.json();
                 setDataframe1([normalizeData(metaData, defaultVal1)]);
                 setRed(true);
+                setLoader(0);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
+                setLoader(0);
                 // Handle errors or set default values
                 setRed(false);
             }
@@ -215,6 +219,26 @@ const Search = () => {
     return (
         <div>
             <div className="app-container">
+                <div
+                    style={{
+                        height: "100vh",
+                        width: "80vw",
+                        position: "absolute",
+                        alignSelf: "center",
+                        display: "flex",
+                        justifyContent: "center",
+                        backgroundColor: "#090707",
+                        zIndex: 1000,
+                        opacity: loader,
+                        display: loader == 0 ? "none" : "flex",
+                    }}
+                >
+                    <img
+                        src={`${process.env.PUBLIC_URL}/loader.gif`}
+                        alt="Loading..."
+                        style={{ height: "50vh", width: "50vh", marginTop: "20vh" }}
+                    />
+                </div>
                 <div className="search-bar-page">
                     <input
                         type="text"

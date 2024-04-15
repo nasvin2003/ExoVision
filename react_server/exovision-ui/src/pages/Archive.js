@@ -12,6 +12,8 @@ function Archive() {
     const [hover2, setHover2] = useState(false);
     const [modalIsOpen, setIsOpen] = React.useState(false);
 
+    const [loader, setLoader] = useState(0.8);
+
     function openModal() {
         setIsOpen(true);
     }
@@ -31,6 +33,7 @@ function Archive() {
             .then((res) => res.json())
             .then((data) => {
                 setData(data);
+                setLoader(0);
             });
     }, []);
 
@@ -42,6 +45,28 @@ function Archive() {
 
     return (
         <div className="app-container">
+
+            <div
+                style={{
+                    height: "100vh",
+                    width: "80vw",
+                    position: "absolute",
+                    alignSelf: "center",
+                    display:"flex",
+                    justifyContent:"center",
+                    backgroundColor: "#090707",
+                    zIndex: 1000,
+                    opacity: loader,
+                    display: loader == 0 ? "none" : "flex",
+                }}
+            >
+                <img
+                    src={`${process.env.PUBLIC_URL}/loader.gif`}
+                    alt="Loading..."
+                    style={{ height: "50vh", width: "50vh", marginTop: "20vh" }}
+                />
+            </div>
+
             <div className="search-and-filter-bar">
                 <div className="search-bar">
                     <input

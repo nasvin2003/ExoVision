@@ -14,3 +14,4 @@ ExoVision_Model_Backup.ipynb
 Datasets/
 react_server/exovision-ui/node_modules/
 react_server/flask-server/venv/
+model_for_ui.h5

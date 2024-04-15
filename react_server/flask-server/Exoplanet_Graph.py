@@ -38,6 +38,7 @@ import astropy.io.fits as fits
 import pyodbc
 import logging
 from flask_cors import CORS
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix
 
 
 app = Flask(__name__)
@@ -377,6 +378,56 @@ def process_file(file):
                 }
     except Exception as e:
         return {"error": str(e)}
+    
+@app.route('/upload_model', methods=['POST', 'GET'])
+def upload_file1():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"})
+    file = request.files['file']
+    # print(file)
+    if file.filename == '':
+        return jsonify({"error": "No selected file"})
+    if file and file.filename.endswith('.h5'):
+        temp_dir = tempfile.mkdtemp() 
+        file_path = os.path.join(temp_dir, file.filename)
+        
+        file.save(file_path)
+        temp = process_file(file_path)
+        return temp
+    return jsonify({"error": "Invalid file format"})
+
+def run_model(file):
+    model = load_model(file)
+    seed_value = 42
+    os.environ['PYTHONHASHSEED'] = str(seed_value)
+    np.random.seed(seed_value)
+    tf.random.set_seed(seed_value)
+    value_df = 10000
+    star_check = pd.read_csv("../../Datasets/final_dataset.csv")
+    star_check = star_check.drop(['tid'],axis=1)
+    star_check_y = star_check[['confirmed_planet']]
+    star_check = star_check.reset_index().drop('index',axis=1)
+    star_check = star_check.apply(lambda row: row.fillna(0), axis=1)
+    avg_val = int(star_check.value_counts(star_check['confirmed_planet']).mean())
+    balanced_star_check = pd.DataFrame()
+    class_counts = star_check['confirmed_planet'].value_counts()
+    for i in range(0,2):
+        if class_counts.loc[class_counts.index == i].iloc[0] > avg_val:
+            balanced_star_check = pd.concat([balanced_star_check, star_check[star_check['confirmed_planet'] == i].sample(avg_val)])
+        else:
+            balanced_star_check = pd.concat([balanced_star_check, star_check[star_check['confirmed_planet'] == i].sample(avg_val, replace=True)])
+    star_check = balanced_star_check.copy()
+    scaler = MinMaxScaler()
+    star_check[['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']] = scaler.fit_transform(star_check[['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']])
+    X_train, X_test, y_train, y_test = train_test_split(star_check.drop('confirmed_planet',axis=1),star_check[['confirmed_planet']], test_size=0.1, random_state=42)
+    X_train_flux = X_train.drop(['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx'],axis=1)
+    X_train_params = X_train[['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']]
+    X_test_flux = X_test.drop(['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx'],axis=1)
+    X_test_params = X_test[['Teff','logg','MH','rad','mass','rho','lum','Tmag','ra','dec','plx']]
+    y_pred = model.predict(X_test_flux)
+    return jsonify({"accuracy": accuracy_score(y_test, y_pred),"precision": precision_score(y_test, y_pred),"recall": recall_score(y_test, y_pred),"f1": f1_score(y_test, y_pred)})
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True)

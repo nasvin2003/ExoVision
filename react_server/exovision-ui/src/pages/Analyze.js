@@ -10,6 +10,8 @@ const Analyze = () => {
     const [hover2, setHover2] = useState(false);
     const [modalIsOpen, setIsOpen] = React.useState(false);
 
+    const [loader, setLoader] = useState(0.8);
+
     function openModal() {
         setIsOpen(true);
     }
@@ -25,6 +27,7 @@ const Analyze = () => {
     Modal.setAppElement("#root");
 
     useEffect(() => {
+        setLoader(0.8)
         const identifier = tid;
         if (tid !== "empty") {
             fetch(`/api/graphs/${identifier}/general`)
@@ -35,12 +38,35 @@ const Analyze = () => {
                         trendPlotUrl: data.trend_plot_url,
                         status: data.status,
                     });
+                    setLoader(0)
                 });
         }
     }, []);
 
     return (
         <div className="app-container">
+
+            <div
+                style={{
+                    height: "100vh",
+                    width: "80vw",
+                    position: "absolute",
+                    alignSelf: "center",
+                    display:"flex",
+                    justifyContent:"center",
+                    backgroundColor: "#090707",
+                    zIndex: 1000,
+                    opacity: loader,
+                    display: loader == 0 ? "none" : "flex",
+                }}
+            >
+                <img
+                    src={`${process.env.PUBLIC_URL}/loader.gif`}
+                    alt="Loading..."
+                    style={{ height: "50vh", width: "50vh", marginTop: "20vh" }}
+                />
+            </div>
+
             {tid !== "empty" ? (
                 <div style={{ marginTop: "5vh" }}>
                     <div style={{ display: "flex", height: "7vh", marginBottom: "20px", width: "100%" }}>
