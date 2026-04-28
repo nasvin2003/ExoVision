@@ -1,10 +1,15 @@
 #!/bin/bash
+set -e
 
-# Navigate to the npm project directory and start the npm process
-cd react_server/exovision-ui && npm run start &
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Navigate to the Python script directory and execute the script
-cd react_server/flask-server && python Exoplanet_Graph.py
+cd "$ROOT_DIR/frontend"
+npm start &
+FRONTEND_PID=$!
 
-# Wait for all background jobs to finish
+cd "$ROOT_DIR/backend"
+python Exoplanet_Graph.py &
+BACKEND_PID=$!
+
+trap "kill $FRONTEND_PID $BACKEND_PID 2>/dev/null || true" EXIT
 wait

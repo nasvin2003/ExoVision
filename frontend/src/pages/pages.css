@@ -1,0 +1,297 @@
+@import "normalize.css";
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+.jap {
+    color: "white";
+    font-size: 100px;
+    font-family: Montserrat-Bold;
+    font-weight: 650;
+    font-style: italic;
+    text-shadow: 10px 10px 10px #000000;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-left: 20vw;
+    box-sizing: border-box;
+    color: #ffffff;
+    
+}
+
+.search-bar {
+    top: 0;
+    z-index: 1000;
+    width: 80%;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    background-color: #202123;
+}
+
+.search-bar-page {
+    z-index: 1;
+    width: 80%;
+    display: flex;
+    height:13vh;
+    align-items: center;
+    justify-content: center;
+    background-color: #202123;
+    position: fixed;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    border: 1px solid black;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.search-page {
+    height: 7vh;
+    width: 70vw;
+    background-color: #000000;
+    border-radius: 15px;
+    border: none;
+    font-size: large;
+    font-family: "Montserrat", sans-serif;
+    padding: 0 15px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.search {
+    height: 5vh;
+    width: 70vw;
+    background-color: #000000;
+    border-color: #202123;
+    border-radius: 15px;
+    border: none;
+    font-size: large;
+    font-family: "Montserrat", sans-serif;
+    padding: 0 15px;
+    color: white;
+    margin-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.archive-container-exo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding-right: 30px;
+}
+
+.archive-container {
+    display: flex;
+    height: 8vh;
+    background-color: #000000;
+    width: 80%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    transition: border 0.1s ease; /* Smooth transition for the border */
+}
+
+.archive-container:hover {
+    border: 2px solid #ff4c29; /* Change color as needed */
+}
+
+.archive-text {
+    margin: 0;
+    flex: 1;
+    text-align: left;
+    display: flex;
+    padding-left: 20px;
+    align-self: center;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.4rem;
+}
+
+.archive-text-exo {
+    margin: 0;
+    flex: 1;
+    text-align: right;
+    align-self: center;
+    width: 100%;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.4rem;
+}
+
+.graph-container {
+    background-color: #000000;
+    height: 30vh;
+    width: 60vw;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+}
+
+.graph-container img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    align-self: center;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+.container-text {
+    display: flex;
+    align-items: center;
+    height: 10%;
+    width: 100%;
+}
+
+.graph-text {
+    color: #e0e1dd;
+    font-size: 1.25rem;
+    text-align: center;
+    margin: 0;
+    padding-left: 30px;
+    padding-top: 5px;
+}
+
+.search-and-filter-bar {
+    /* position: -webkit-sticky; */
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    background-color: #202123;
+    padding: 10px 0;
+    border-radius: 0;
+    margin-bottom: 20px;
+}
+
+.filter-dropdown {
+    margin-left: 10px;
+    align-self: center;
+}
+
+.filter {
+    height: 5vh;
+    background-color: #000000;
+    border: 1px solid #202123;
+    border-radius: 15px;
+    color: white;
+    font-size: large;
+    font-family: "Montserrat", sans-serif;
+    width: 15vw;
+    padding: 0 15px;
+}
+
+.home__page__screen {
+    height: 100vh;
+    width: 100vw;
+    justify-content: center;
+}
+
+.video-background {
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.welcome__logo {
+    font-size: 2.5rem;
+    font-weight: 500;
+    padding-top: 50px;
+    padding-left: 50px;
+    font-family: "Montserrat", sans-serif;
+    margin-top: -100vh;
+    margin-bottom: 75px;
+    z-index: 1;
+}
+
+.nav__button__home {
+    padding: 10px 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 2.2rem;
+    font-weight: 250;
+    background-color: #000000;
+    width: 30vw;
+    margin: 20px;
+    margin-top: 75vh;
+    border-radius: 45px;
+    border-style: solid;
+    border-color: #000000;
+    cursor: pointer;
+}
+
+.nav__button__home:hover {
+    border-color: #ff4c29;
+}
+
+.buttons__home {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+    width: auto;
+    text-align: center;
+}
+
+/* @keyframes slideDown {
+    from {
+        transform: translateY(-100vh);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100vw) rotate(60deg);
+    }
+    to {
+        transform: translateX(0) rotate(60deg);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100vw) rotate(120deg);
+    }
+    to {
+        transform: translateX(0) rotate(120deg);
+    }
+}
+
+.welcome__logo,
+.buttons__home,
+.line {
+    animation: slideDown 1s ease-out forwards;
+}
+
+.box-left {
+    animation: slideInLeft 1s ease-out forwards;
+}
+
+.box-right {
+    animation: slideInRight 1s ease-out forwards;
+} */
